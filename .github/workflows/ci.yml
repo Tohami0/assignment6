@@ -32,7 +32,7 @@ jobs:
         python -m pip install --upgrade pip
         pip freeze > requirements.txt
         cat requirements.txt
-        pip install -r requirments.txt 
+        pip install -r requirements.txt 
         pip install pytest flake8
 
     # Step 4: Run flake8 for code quality checks
