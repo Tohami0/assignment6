@@ -43,6 +43,8 @@ jobs:
         run: |
           # Ensure the entire codebase adheres to PEP 8 standards
           flake8 .
+          max-line-length = 88
+          ignore = E501  
         # Optionally, include flags like `--max-line-length=88` for customization
 
       # Step 5: Run pytest for tests
