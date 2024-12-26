@@ -1,57 +1,52 @@
 name: CI/CD Pipeline
 
-# Trigger the workflow on specific events
+# Events that trigger the workflow
 on:
+  # Trigger when code is pushed to the main branch
   push:
     branches:
       - main
+  # Trigger when a pull request is opened or updated for the main branch
   pull_request:
     branches:
       - main
+  # Schedule the workflow to run daily at midnight UTC
   schedule:
-    - cron: "0 2 * * *"  # Runs every day at 2:00 AM UTC
+    - cron: "0 0 * * *"
 
+# Define jobs for the workflow
 jobs:
-  build-and-test:
+  test_and_lint:
+    # Use the latest Ubuntu environment
     runs-on: ubuntu-latest
 
+    # Steps to execute in this job
     steps:
-    # Step 1: Check out the repository
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Step 2: Set up Python environment
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.9"
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' # Specify the Python version
 
-    # Step 3: Install dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip freeze > requirements.txt
-        touch requirements.txt
-        cat requirements.txt
-        pip install -r requirements.txt 
-        pip install pytest flake8
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest flake8
 
-    # Step 4: Run flake8 for code quality checks
-    - name: Code quality check (flake8)
-      run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      # Step 4: Run flake8 for code quality checks
+      - name: Run flake8
+        run: |
+          # Ensure the entire codebase adheres to PEP 8 standards
+          flake8 .
+        # Optionally, include flags like `--max-line-length=88` for customization
 
-    # Step 5: Run pytest for testing
-    - name: Run tests with pytest
-      run: |
-        pytest
-
-  notify:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Notify on Failure
-      if: failure()
-      run: echo "One or more jobs failed. Please review the pipeline logs."
+      # Step 5: Run pytest for tests
+      - name: Run pytest
+        run: |
+          # Execute all test cases in the project
+          pytest
